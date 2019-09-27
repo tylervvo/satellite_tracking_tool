@@ -4,7 +4,7 @@
 import googlemaps
 import sys
 
-api_key = 'AIzaSyAX6BHi47AuAlkCUEVEaUC4vBSUr0TBM2I'
+api_key = 'Fill in google api key here'
 
 gm = googlemaps.Client(key=api_key)
 if len(sys.argv) > 1:
