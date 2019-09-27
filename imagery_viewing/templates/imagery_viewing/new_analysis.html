@@ -1,0 +1,107 @@
+
+
+<html>
+    <head>
+        <title>New Analysis</title>
+        <meta name="viewport" content="initial-scale=1.0">
+        <meta charset="utf-8">
+        <style>          
+          #map { 
+            height: 400px;    
+            width: 600px;            
+          }          
+        </style>        
+    </head>    
+    <body>
+
+    	<form method="POST">
+        	{% csrf_token %}
+        	<p> Type : {{ form.type_analysis }}</p>
+	        <p> Start Date: {{ form.start_date }} </p>
+	        <p> End Date: {{ form.end_date }} </p>
+	        <p> Frequency: {{ form.frequency }} </p>
+	        <p> North East Longitude: {{ form.north_east_long }}</p>
+	       	<p> North East Latitude: {{ form.north_east_lat }}</p>
+	        <p> South West Longitude: {{ form.south_west_long }}</p>
+	        <p> South West Latitude: {{ form.south_west_lat }}</p>
+
+	        <p> Find coordinates of the region with this map. Double click the map to mark the location. </p>
+
+	        <div id="latclicked"></div>
+	        <div id="longclicked"></div>
+	        
+	        <div id="latmoved"></div>
+	        <div id="longmoved"></div>
+	        
+	        <div style="padding:10px">
+	            <div id="map"></div>
+	        </div>
+
+			<input type="submit" value="Submit">
+    	</form> 
+       
+<!--        This script uses gogole maps api to display a map to get the longitude latitude of an area of land -->
+        <script type="text/javascript">
+        var map;
+        
+        function initMap() {                            
+            var latitude = 37.77389; // YOUR LATITUDE VALUE
+            var longitude = -122.4194; // YOUR LONGITUDE VALUE
+            
+            var myLatLng = {lat: latitude, lng: longitude};
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+              center: myLatLng,
+              zoom: 14,
+              disableDoubleClickZoom: true, // disable the default map zoom on double click
+            });
+            
+            // Update lat/long value of div when anywhere in the map is clicked    
+            google.maps.event.addListener(map,'click',function(event) {                
+                document.getElementById('latclicked').innerHTML = "Marked Longitude: " + event.latLng.lat();
+                document.getElementById('longclicked').innerHTML = "Marked Latitude: " + event.latLng.lng();
+            });
+            
+            // Update lat/long value of div when you move the mouse over the map
+            google.maps.event.addListener(map,'mousemove',function(event) {
+                document.getElementById('latmoved').innerHTML = "Current Longitude: " + event.latLng.lat();
+                document.getElementById('longmoved').innerHTML = "Current Latitude: " + event.latLng.lng();
+            });
+                    
+            var marker = new google.maps.Marker({
+              position: myLatLng,
+              map: map,
+              //title: 'Hello World'
+              
+              // setting latitude & longitude as title of the marker
+              // title is shown when you hover over the marker
+              title: latitude + ', ' + longitude 
+            });    
+            
+            // Update lat/long value of div when the marker is clicked
+            marker.addListener('click', function(event) {              
+              document.getElementById('latclicked').innerHTML = event.latLng.lat();
+              document.getElementById('longclicked').innerHTML =  event.latLng.lng();
+            });
+            
+            // Create new marker on double click event on the map
+            google.maps.event.addListener(map,'dblclick',function(event) {
+                var marker = new google.maps.Marker({
+                  position: event.latLng, 
+                  map: map, 
+                  title: event.latLng.lat()+', '+event.latLng.lng()
+                });
+                
+                // Update lat/long value of div when the marker is clicked
+                marker.addListener('click', function() {
+                  document.getElementById('latclicked').innerHTML = event.latLng.lat();
+                  document.getElementById('longclicked').innerHTML =  event.latLng.lng();
+                });            
+            });
+            
+        }
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAX6BHi47AuAlkCUEVEaUC4vBSUr0TBM2I&callback=initMap"
+        async defer></script>
+    </body>    
+</html>

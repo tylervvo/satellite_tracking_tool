@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <title>Main</title>
+    </head>
+    <body>
+        Hello this is the satellite mapping tracking tool stand alone app! 
+        {% for item in analysis_list %}
+        <button onclick="display_case_images('{{ item.case }}', '{{ item.type_analysis }}')"> {{ item.case }} </button>
+        {% endfor %}
+       	<div id="display_images"></div>
+    </div>
+
+  	<script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-app.js"></script>
+  	<script src="https://www.gstatic.com/firebasejs/6.4.2/firebase-storage.js"></script>
+    <script>
+		var firebaseConfig = {
+		  'apiKey': "AIzaSyCbNY_L1OzSB5wPB981J64qxFKTqM3K9RU",
+		  'authDomain': "satellite-mapping-standalone.firebaseapp.com",
+		  'databaseURL': "https://satellite-mapping-standalone.firebaseio.com",
+		  'projectId': "satellite-mapping-standalone",
+		  'storageBucket': "satellite-mapping-standalone.appspot.com",
+		  'messagingSenderId': "470637696129",
+		  'appId': "1:470637696129:web:24555fc15cd9a087"
+		};
+
+		firebase.initializeApp(firebaseConfig);
+		var database = firebase.storage();
+		showAllImages();
+
+		// Given an image ref, displays the image and the date it was taken
+		function displayImage(imageRef) {
+			imageRef.getDownloadURL().then(function(url) {
+			  var image_div = document.getElementById('display_images');
+			  var p_elem = document.createElement("p");
+			  var img_elem = document.createElement("img");
+
+			  p_elem.textContent = imageRef.name;
+			  img_elem.src = url;
+			  image_div.appendChild(p_elem);
+			  image_div.appendChild(img_elem);
+			 }).catch(function(error) {
+			 	console.log(error);
+			 });
+			}
+
+		//Shows all of the images in the bucket
+		function showAllImages(){
+			var ref = database.ref();
+			var images_folder = ref.child('images');
+			images_folder.listAll().then(function(result){
+				result.items.forEach(function(imageRef){
+					displayImage(imageRef);
+				})
+			}).catch(function(error){
+				console.log(error);
+			});
+		}
+
+		//Clears display id, and displays only the photos from the specific case and type
+		function display_case_images(case_name, type_name){
+			//clear display_images div 
+			var image_div = document.getElementById('display_images');
+			image_div.innerHTML = "";
+
+			var ref = database.ref();
+			ref.listAll().then(function(result){
+				result.items.forEach(function(imageRef){
+					//if image matches case_name and type_name then: 
+					var image_name = imageRef.name;
+					var info = image_name.split(".")
+					var case_img = info[0]
+					var filter = info[1]
+					var date_acquired = info[2]
+					if (case_img == case_name && filter == type_name) {
+						displayImage(imageRef);
+					}
+				})
+			}).catch(function(error){
+				console.log(error);
+			});
+		}
+
+
+	</script>
+    </body>
+</html>
